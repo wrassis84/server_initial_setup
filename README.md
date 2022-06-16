@@ -1,5 +1,5 @@
-Helo! This playbook makes the initial server config for ubuntu servers.
-Its:
+Helo!
+This playbook makes the initial server config for ubuntu servers:
 1 - Install aptitude
 2 - Setup Passwordless sudo
 3 - Create a new regular user with sudo priviledges
