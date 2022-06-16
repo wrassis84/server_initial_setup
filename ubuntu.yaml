@@ -1,4 +1,4 @@
-# This file: ~/ansible/playbooks/miscellanious/initial_server_setup_ubuntu.yml
+# This file: ~/ansible/playbooks/miscellaneous/initial_server_setup_ubuntu.yml
 ---
 - hosts: all
   become: true
