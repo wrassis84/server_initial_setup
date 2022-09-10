@@ -1,4 +1,4 @@
-# This file: ~/ansible/playbooks/miscellaneous/initial_server_setup_ubuntu.yml
+# This file: ~/ansible/playbooks/miscellaneous/server_initial_setup_ubuntu.yml
 ---
 - hosts: all
   become: true
@@ -50,6 +50,22 @@
           - ufw
         state: latest
         update_cache: true
+  
+    - name: Copy .vimrc to /home/{{ created_username }}/.vimrc and create a backup of .vimrc
+      copy:
+        src: ../files/.vimrc
+        dest: /home/{{ created_username }}/.vimrc
+        backup: yes 
+      tags:
+        - vimrc
+        
+     - name: Copy .bashrc to /home/{{ created_username }}/.bashrc and create a backup of .bashrc
+       copy:
+         src: ../files/.bashrc
+         dest: /home/{{ created_username }}/.bash
+         backup: yes 
+       tags:
+        - bashrc
 
     - name: UFW - Allow SSH connections
       community.general.ufw:
