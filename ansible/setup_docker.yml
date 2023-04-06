@@ -1,0 +1,139 @@
+---
+# At executing this playbook you can limit the hosts with "-l, --limit":
+# ansible-playbook playbook.yml -l server1 -u sysadmin
+- hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    container_count: 4
+    default_container_name: docker
+    default_container_image: ubuntu
+    default_container_command: sleep 1d
+    created_username: sysadmin
+    
+  tasks:
+    - name: Get Ubuntu codename
+      shell: lsb_release -cs
+      register: codename
+
+    - name: Print out the codename
+      debug:
+        msg: "This is my {{ codename.stdout }} release!"   
+      tags:
+      - never
+      - print_codename
+
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - git
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg2
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+          - lsb-release
+          - lsb-core
+        state: latest
+        update_cache: yes
+      tags: install_pkgs
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Verify key fingerprint
+      apt_key:
+        id: 0EBFCD88
+        state: present
+      tags:
+      - fingerprint
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu "{{ codename.stdout }}" stable
+        state: present
+        update_cache: yes
+
+    - name: Update apt and install docker-ce | docker-ce-cli | containerd
+      apt:
+        name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+
+    - name: Ensure group docker exists
+      ansible.builtin.group:
+        name: docker
+        state: present
+
+    - name: Add users on docker group
+      ansible.builtin.user:
+        name: "{{ created_username }}"
+        groups: docker
+        append: yes
+      tags: add_docker_group
+      
+    - name: Restart docker service
+      systemd:
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+        name: docker
+
+    - name: Pull default docker image
+      community.docker.docker_image:
+        name: "{{ default_container_image }}"
+        source: pull
+
+    - name: Create default containers
+      community.docker.docker_container:
+        name: "{{ default_container_name }}{{ item }}"
+        image: "{{ default_container_image }}"
+        command: "{{ default_container_command }}"
+        state: present
+      with_sequence: count={{ container_count }}
+
+    - name: Getting all created containers
+      shell: docker ps -a
+      register: created_containers
+
+    - name: Showing all created containers
+      debug:
+        msg: "{{ created_containers.stdout }}"   
+      
+    - name: Take a pause
+      shell: sleep 3
+    
+    - name: Killing all created containers
+      community.docker.docker_container:
+        name: "{{ default_container_name }}{{ item }}"
+        image: "{{ default_container_image }}"
+        command: "{{ default_container_command }}"
+        state: absent
+      with_sequence: count={{ container_count }}
+      tags:
+      - never
+      - destroy
+...
