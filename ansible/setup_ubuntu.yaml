@@ -60,15 +60,15 @@
       tags:
         - vimrc
         
-    - name: Config .vimrc to /home/{{ root_user }}/ and backup .vimrc
+    - name: Config .vimrc to /{{ root_user }}/ and backup .vimrc
       copy:
         src: ../files/.vimrc
-        dest: /home/{{ root_user }}/.vimrc
+        dest: /{{ root_user }}/.vimrc
         backup: yes 
       tags:
         - vimrc
         
-    - name: Config .bashrc to /home/{{ created_username }}/ and backup .bashrc
+    - name: Config .bashrc to /{{ created_username }}/ and backup .bashrc
       copy:
         src: ../files/.bashrc
         dest: /home/{{ created_username }}/.bashrc
@@ -79,7 +79,7 @@
     - name: Config .bashrc to /home/{{ root_user }}/ and backup .bashrc
       copy:
         src: ../files/.bashrc_root
-        dest: /home/{{ root_user }}/.bashrc
+        dest: /{{ root_user }}/.bashrc
         backup: yes 
       tags:
        - bashrc_root
