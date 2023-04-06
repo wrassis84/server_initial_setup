@@ -4,6 +4,7 @@
   become: true
   vars:
     created_username: sysadmin
+    root_user: root
 
   tasks:
     - name: Install aptitude
@@ -59,6 +60,14 @@
       tags:
         - vimrc
         
+    - name: Config .vimrc to /home/{{ root_user }}/ and backup .vimrc
+      copy:
+        src: ../files/.vimrc
+        dest: /home/{{ root_user }}/.vimrc
+        backup: yes 
+      tags:
+        - vimrc
+        
     - name: Config .bashrc to /home/{{ created_username }}/ and backup .bashrc
       copy:
         src: ../files/.bashrc
@@ -67,10 +76,10 @@
       tags:
        - bashrc
 
-    - name: Config .bashrc to /home/{{ created_username }}/ and backup .bashrc
+    - name: Config .bashrc to /home/{{ root_user }}/ and backup .bashrc
       copy:
         src: ../files/.bashrc_root
-        dest: /home/{{ created_username }}/.bashrc
+        dest: /home/{{ root_user }}/.bashrc
         backup: yes 
       tags:
        - bashrc_root
