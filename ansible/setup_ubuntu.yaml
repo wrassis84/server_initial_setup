@@ -51,7 +51,7 @@
         state: latest
         update_cache: true
   
-    - name: Copy .vimrc to /home/{{ created_username }}/.vimrc and create a backup of .vimrc
+    - name: Config .vimrc to /home/{{ created_username }}/ and backup .vimrc
       copy:
         src: ../files/.vimrc
         dest: /home/{{ created_username }}/.vimrc
@@ -59,13 +59,21 @@
       tags:
         - vimrc
         
-     - name: Copy .bashrc to /home/{{ created_username }}/.bashrc and create a backup of .bashrc
-       copy:
-         src: ../files/.bashrc
-         dest: /home/{{ created_username }}/.bash
-         backup: yes 
-       tags:
-        - bashrc
+    - name: Config .bashrc to /home/{{ created_username }}/ and backup .bashrc
+      copy:
+        src: ../files/.bashrc
+        dest: /home/{{ created_username }}/.bashrc
+        backup: yes 
+      tags:
+       - bashrc
+
+    - name: Config .bashrc to /home/{{ created_username }}/ and backup .bashrc
+      copy:
+        src: ../files/.bashrc_root
+        dest: /home/{{ created_username }}/.bashrc
+        backup: yes 
+      tags:
+       - bashrc_root
 
     - name: UFW - Allow SSH connections
       community.general.ufw:
@@ -76,3 +84,4 @@
       community.general.ufw:
         state: enabled
         default: deny
+...
