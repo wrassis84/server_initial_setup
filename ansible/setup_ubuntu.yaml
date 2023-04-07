@@ -53,7 +53,7 @@
         update_cache: true
   
     - name: Config .vimrc to /home/{{ created_username }}/ and backup .vimrc
-      copy:
+      ansible.builtin.copy:
         src: ../files/.vimrc
         dest: /home/{{ created_username }}/.vimrc
         backup: yes 
@@ -61,7 +61,7 @@
         - vimrc
         
     - name: Config .vimrc to /{{ root_user }}/ and backup .vimrc
-      copy:
+      ansible.builtin.copy:
         src: ../files/.vimrc
         dest: /{{ root_user }}/.vimrc
         backup: yes 
@@ -69,7 +69,7 @@
         - vimrc
         
     - name: Config .bashrc to /{{ created_username }}/ and backup .bashrc
-      copy:
+      ansible.builtin.copy:
         src: ../files/.bashrc
         dest: /home/{{ created_username }}/.bashrc
         backup: yes 
@@ -77,12 +77,43 @@
        - bashrc
 
     - name: Config .bashrc to /home/{{ root_user }}/ and backup .bashrc
-      copy:
+      ansible.builtin.copy:
         src: ../files/.bashrc_root
         dest: /{{ root_user }}/.bashrc
         backup: yes 
       tags:
        - bashrc_root
+
+    - name: Config ssh banner file and backup original issue file
+      ansible.builtin.copy:
+        src: ../files/issue
+        dest: /etc/issue
+        backup: yes 
+      tags:
+       - ssh_issue
+
+    - name: Config ssh banner file and backup original issue.net file
+      ansible.builtin.copy:
+        src: ../files/issue.net
+        dest: /etc/issue.net
+        backup: yes 
+      tags:
+       - ssh_issue.net
+
+    - name: Config motd file and backup original motd file
+      ansible.builtin.copy:
+        src: ../files/motd
+        dest: /etc/motd
+        backup: yes 
+      tags:
+       - motd      
+
+    - name: Config ssh banner message
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        state: present
+        regexp: '^#Banner none'
+        line: 'Banner /etc/issue.net'
 
     - name: UFW - Allow SSH connections
       community.general.ufw:

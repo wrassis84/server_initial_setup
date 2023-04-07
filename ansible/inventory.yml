@@ -1,9 +1,9 @@
 [docker_swarm_manager]
-manager001 ansible_host=192.168.0.230
+tf-node000 ansible_host=192.168.0.230
 
 [docker_swarm_worker]
-worker001 ansible_host=192.168.0.231
-worker002 ansible_host=192.168.0.232
+tf-node001 ansible_host=192.168.0.231
+tf-node002 ansible_host=192.168.0.232
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3

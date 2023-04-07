@@ -42,3 +42,4 @@ override.tf.json
 *.log
 
 # Ignore other files:
+terraform-proxmox
