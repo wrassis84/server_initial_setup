@@ -8,8 +8,8 @@
 # Author          : William Ramos de Assis Rezende
 # Maintainer      : William Ramos de Assis Rezende
 #
-# DataTex.sh      : List, Add and Remove users from DataTex systems.
-# Requirements    : LibTex.sh
+# Deploy.sh       : Executes Ansible Playbooks to Deploy Servers.
+# Requirements    : bash, ansible
 # Usage           : DataTex.sh [ list | add | remove ]
 
 ######## TESTING ENVIRONMENT ###################################################
@@ -21,8 +21,8 @@
 ######## FUNCTIONS #############################################################
 clean_ssh () {
   for i in $(seq 0 2); do
-    ssh-keygen -f '/home/william/.ssh/known_hosts' \
-               -R '192.168.0.23$i' > /dev/null 2>&1;
+    ssh-keygen -f "$HOME/.ssh/known_hosts"         \
+               -R "192.168.0.23$i" > /dev/null 2>&1;
   done           
 }
 ######## MAIN CODE - START #####################################################
@@ -31,7 +31,10 @@ clean_ssh () {
 echo "Configuring ssh hosts..."
 clean_ssh
 echo "Playing setup_ubuntu.yaml..."
-ansible-playbook setup_ubuntu.yaml -u sysadmin -b > /dev/null
+ansible-playbook setup_ubuntu.yaml -u sysadmin -b #> /dev/null
 echo "Playing setup_docker.yaml"
-ansible-playbook setup_docker.yaml -u sysadmin -b > /dev/null
+ansible-playbook setup_docker.yaml -u sysadmin -b #> /dev/null
 ######## MAIN CODE - END #######################################################
+# TODO:
+# Test if ansible is installed;
+# Checks that servers are running and reachable;
