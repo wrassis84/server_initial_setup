@@ -26,12 +26,12 @@ clean_ssh () {
   done           
 }
 ######## MAIN CODE - START #####################################################
-#echo "Configuring environment..."
-#source ../../.env
 echo "Configuring ssh hosts..."
 clean_ssh
+
 echo "Playing setup_ubuntu.yaml..."
 ansible-playbook setup_ubuntu.yaml -u sysadmin -b #> /dev/null
+
 echo "Playing setup_docker.yaml"
 ansible-playbook setup_docker.yaml -u sysadmin -b #> /dev/null
 ######## MAIN CODE - END #######################################################
