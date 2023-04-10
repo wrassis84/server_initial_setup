@@ -123,6 +123,9 @@
           {{ hostvars[host].ansible_host }} {{ host }}
           {% endfor %}
       tags: gen_etc/hosts
+          # {% for host in groups.all %}
+          # {{ hostvars[host].ansible_default_ipv4.address }} {{ hostvars[host].ansible_fqdn }} {{ hostvars[host].ansible_hostname }}
+          # {% endfor %}
 
     - name: UFW - Allow SSH connections
       community.general.ufw:
