@@ -14,24 +14,24 @@
     
   tasks:
     - name: Get Ubuntu codename
-      shell: lsb_release -cs
+      ansible.builtin.shell: lsb_release -cs
       register: codename
 
     - name: Print out the codename
-      debug:
-        msg: "This is my {{ codename.stdout }} release!"   
+      ansible.builtin.debug:
+        msg: "This is my {{ codename.stdout }} release!"
       tags:
       - never
       - print_codename
 
     - name: Install aptitude
-      apt:
+      ansible.builtin.apt:
         name: aptitude
         state: latest
         update_cache: true
 
     - name: Install required system packages
-      apt:
+      ansible.builtin.apt:
         pkg:
           - git
           - apt-transport-https
@@ -49,25 +49,25 @@
       tags: install_pkgs
 
     - name: Add Docker GPG apt Key
-      apt_key:
+      ansible.builtin.apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
     - name: Verify key fingerprint
-      apt_key:
+      ansible.builtin.apt_key:
         id: 0EBFCD88
         state: present
       tags:
       - fingerprint
 
     - name: Add Docker Repository
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu "{{ codename.stdout }}" stable
         state: present
         update_cache: yes
 
     - name: Update apt and install docker-ce | docker-ce-cli | containerd
-      apt:
+      ansible.builtin.apt:
         name:
         - docker-ce
         - docker-ce-cli
@@ -76,11 +76,11 @@
         update_cache: true
 
     - name: Install Docker Module for Python
-      pip:
+      ansible.builtin.pip:
         name: docker
 
     - name: Install Docker Compose
-      pip:
+      ansible.builtin.pip:
         name: docker-compose
 
     - name: Ensure group docker exists
@@ -96,7 +96,7 @@
       tags: add_docker_group
       
     - name: Restart docker service
-      systemd:
+      ansible.builtin.systemd:
         state: restarted
         enabled: yes
         daemon_reload: yes
@@ -116,15 +116,15 @@
       with_sequence: count={{ container_count }}
 
     - name: Getting all created containers
-      shell: docker ps -a
+      ansible.builtin.shell: docker ps -a
       register: created_containers
 
     - name: Showing all created containers
-      debug:
-        msg: "{{ created_containers.stdout }}"   
+      ansible.builtin.debug:
+        msg: "{{ created_containers.stdout }}"
       
     - name: Take a pause
-      shell: sleep 3
+      ansible.builtin.shell: sleep 3
     
     - name: Killing all created containers
       community.docker.docker_container:

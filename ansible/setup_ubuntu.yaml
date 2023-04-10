@@ -8,13 +8,13 @@
 
   tasks:
     - name: Install aptitude
-      apt:
+      ansible.builtin.apt:
         name: aptitude
         state: latest
         update_cache: true
 
     - name: Setup passwordless sudo
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/sudoers
         state: present
         regexp: '^%sudo'
@@ -22,7 +22,7 @@
         validate: '/usr/sbin/visudo -cf %s'
 
     - name: Create a new regular user with sudo privileges
-      user:
+      ansible.builtin.user:
         name: "{{ created_username }}"
         state: present
         groups: sudo
@@ -36,14 +36,14 @@
         key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
     - name: Disable password authentication for root
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         state: present
         regexp: '^#?PermitRootLogin'
         line: 'PermitRootLogin prohibit-password'
 
     - name: Update apt and install required system packages
-      apt:
+      ansible.builtin.apt:
         pkg:
           - curl
           - vim
@@ -109,11 +109,22 @@
        - motd      
 
     - name: Config ssh banner message
-      lineinfile:
+      ansible.builtin.lineinfile:
+        # ansible.builtin.replace module -> l1nq.com/1XpHT
         path: /etc/ssh/sshd_config
         state: present
         regexp: '^#Banner none'
         line: 'Banner /etc/issue.net'
+
+    - name: Add Ansible inventory mappings to /etc/hosts
+      # become:: true
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        block: |
+          {% for host in groups ['all'] %}
+          {{ hostvars[host].ansible_host }} {{ host }}
+          {% endfor %}
+      tags: gen_etc/hosts
 
     - name: UFW - Allow SSH connections
       community.general.ufw:
