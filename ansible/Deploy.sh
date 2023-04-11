@@ -26,6 +26,9 @@ clean_ssh () {
   done           
 }
 ######## MAIN CODE - START #####################################################
+echo "Configuring environment..."
+cd ../ && source .env && cd - > /dev/null
+
 echo "Configuring ssh hosts..."
 clean_ssh
 
