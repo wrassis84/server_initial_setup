@@ -1,4 +1,6 @@
 ---
+# For inspiration: How To Automate Initial Server Setup -> encr.pw/lcZmQ
+
 - hosts: all
   become: true
   vars:
@@ -6,10 +8,23 @@
     root_user: root
 
   tasks:
+    - name: Clean ssh hosts after deployed by Terraform
+      ansible.builtin.known_hosts:
+        path: /home/william/.ssh/known_hosts
+        name: "{{ item }}"
+        state: absent
+      # loop: "{{ groups['all'] }}"
+      loop:
+        - 192.168.0.230
+        - 192.168.0.231
+        - 192.168.0.232
+      tags:
+        - clean_ssh_hosts
+
     - name: Install aptitude
       ansible.builtin.apt:
         name: aptitude
-        state: latest
+        state: present
         update_cache: true
 
     - name: Setup passwordless sudo
@@ -50,7 +65,26 @@
           - ufw
         state: latest
         update_cache: true
-  
+
+    - name: Update all installed packages
+      ansible.builtin.apt:
+        name: "*"
+        state: latest
+
+    - name: Make sure NTP service is running
+      ansible.builtin.systemd:
+        state: started
+        name: systemd-timesyncd
+
+    - name: Remove dependencies that are no longer required
+      # Diferenças entre autoclean, autoremove e clean -> encr.pw/F9hYz
+      ansible.builtin.apt:
+        autoremove: true
+        autoclean: true
+        clean: true
+      tags:
+        - clean_system
+
     - name: Config .vimrc to /home/{{ created_username }}/ and backup .vimrc
       ansible.builtin.copy:
         src: ../files/.vimrc
@@ -119,10 +153,11 @@
       ansible.builtin.blockinfile:
         path: /etc/hosts
         block: |
-          {% for host in groups ['all'] %}
+          {% for host in groups['all'] %}
           {{ hostvars[host].ansible_host }} {{ host }}
           {% endfor %}
-      tags: gen_etc/hosts
+      tags:
+        - gen_etc/hosts
           # {% for host in groups.all %}
           # {{ hostvars[host].ansible_default_ipv4.address }} {{ hostvars[host].ansible_fqdn }} {{ hostvars[host].ansible_hostname }}
           # {% endfor %}
