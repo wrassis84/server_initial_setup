@@ -19,18 +19,18 @@
 ######## VARIABLES #############################################################
 
 ######## FUNCTIONS #############################################################
-# clean_ssh () {
-#   for i in $(seq 0 2); do
-#     ssh-keygen -f "$HOME/.ssh/known_hosts"         \
-#                -R "192.168.0.23$i" > /dev/null 2>&1;
-#   done           
-# }
+CleanSSH () {
+  for i in $(seq 0 2); do
+    ssh-keygen -f "$HOME/.ssh/known_hosts"         \
+               -R "192.168.0.23$i" > /dev/null 2>&1;
+  done           
+}
 ######## MAIN CODE - START #####################################################
 echo "Configuring environment..."
 cd ../ && source .env && cd - > /dev/null
 
-# echo "Configuring ssh hosts..."
-# clean_ssh
+echo "Configuring ssh hosts..."
+CleanSSH
 
 echo "Playing setup_ubuntu.yaml..."
 ansible-playbook setup_ubuntu.yaml -u sysadmin -b #> /dev/null
