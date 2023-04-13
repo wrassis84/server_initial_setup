@@ -47,7 +47,7 @@
       ansible.posix.authorized_key:
         user: "{{ created_username }}"
         state: present
-        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+        key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub') }}"
 
     - name: Disable password authentication for root
       ansible.builtin.lineinfile:
@@ -85,65 +85,65 @@
       tags:
         - clean_system
 
-    - name: Config .vimrc to /home/{{ created_username }}/ and backup .vimrc
+    - name: Config .vimrc to users and backup .vimrc
       ansible.builtin.copy:
         src: ../files/.vimrc
         dest: /home/{{ created_username }}/.vimrc
-        backup: yes 
+        backup: true
       tags:
         - vimrc
-        
-    - name: Config .vimrc to /{{ root_user }}/ and backup .vimrc
+
+    - name: Config .vimrc to root and backup .vimrc
       ansible.builtin.copy:
         src: ../files/.vimrc
         dest: /{{ root_user }}/.vimrc
-        backup: yes 
+        backup: true
       tags:
-        - vimrc
-        
-    - name: Config .bashrc to /{{ created_username }}/ and backup .bashrc
+        - vimrc_root
+
+    - name: Config .bashrc to users and backup .bashrc
       ansible.builtin.copy:
         src: ../files/.bashrc
         dest: /home/{{ created_username }}/.bashrc
-        backup: yes 
+        backup: true 
       tags:
-       - bashrc
+        - bashrc
 
-    - name: Config .bashrc to /home/{{ root_user }}/ and backup .bashrc
+    - name: Config .bashrc to root and backup .bashrc
       ansible.builtin.copy:
         src: ../files/.bashrc_root
         dest: /{{ root_user }}/.bashrc
-        backup: yes 
+        backup: true
       tags:
-       - bashrc_root
+        - bashrc_root
 
     - name: Config ssh banner file and backup original issue file
       ansible.builtin.copy:
         src: ../files/issue
         dest: /etc/issue
-        backup: yes 
+        backup: true
       tags:
-       - ssh_issue
+        - ssh_issue
 
     - name: Config ssh banner file and backup original issue.net file
       ansible.builtin.copy:
         src: ../files/issue.net
         dest: /etc/issue.net
-        backup: yes 
+        backup: true
       tags:
-       - ssh_issue.net
+        - ssh_issue.net
 
     - name: Config motd file and backup original motd file
       ansible.builtin.copy:
         src: ../files/motd
         dest: /etc/motd
-        backup: yes 
+        backup: true 
       tags:
-       - motd      
+        - motd
 
     - name: Config ssh banner message
       ansible.builtin.lineinfile:
-        # ansible.builtin.replace module -> l1nq.com/1XpHT
+      # ansible.builtin.replace module -> l1nq.com/1XpHT
         path: /etc/ssh/sshd_config
         state: present
         regexp: '^#Banner none'
@@ -157,7 +157,7 @@
           {{ hostvars[host].ansible_host }} {{ host }}
           {% endfor %}
       tags:
-        - gen_etc/hosts
+        - etc_hosts
           # {% for host in groups.all %}
           # {{ hostvars[host].ansible_default_ipv4.address }} {{ hostvars[host].ansible_fqdn }} {{ hostvars[host].ansible_hostname }}
           # {% endfor %}
@@ -166,9 +166,13 @@
       community.general.ufw:
         rule: allow
         name: OpenSSH
+      tags:
+        - allow_ssh
 
     - name: UFW - Enable and deny by default
       community.general.ufw:
         state: enabled
         default: deny
+      tags:
+        - deny
 ...

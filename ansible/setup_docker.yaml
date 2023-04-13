@@ -11,18 +11,18 @@
     default_container_image: ubuntu
     default_container_command: sleep 1d
     created_username: sysadmin
-    
+
   tasks:
     - name: Get Ubuntu codename
-      ansible.builtin.shell: lsb_release -cs
+      ansible.builtin.command: lsb_release -cs
       register: codename
 
     - name: Print out the codename
       ansible.builtin.debug:
         msg: "This is my {{ codename.stdout }} release!"
       tags:
-      - never
-      - print_codename
+        - never
+        - print_codename
 
     - name: Install aptitude
       ansible.builtin.apt:
@@ -45,8 +45,9 @@
           - lsb-release
           - lsb-core
         state: latest
-        update_cache: yes
-      tags: install_pkgs
+        update_cache: true
+      tags:
+        - install_pkgs
 
     - name: Add Docker GPG apt Key
       ansible.builtin.apt_key:
@@ -58,22 +59,24 @@
         id: 0EBFCD88
         state: present
       tags:
-      - fingerprint
+        - fingerprint_key
 
     - name: Add Docker Repository
       ansible.builtin.apt_repository:
         repo: deb https://download.docker.com/linux/ubuntu "{{ codename.stdout }}" stable
         state: present
-        update_cache: yes
+        update_cache: true
 
     - name: Update apt and install docker-ce | docker-ce-cli | containerd
       ansible.builtin.apt:
         name:
-        - docker-ce
-        - docker-ce-cli
-        - containerd.io
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
         state: latest
         update_cache: true
+      tags:
+        - install_docker
 
     - name: Install Docker Module for Python
       ansible.builtin.pip:
@@ -92,14 +95,15 @@
       ansible.builtin.user:
         name: "{{ created_username }}"
         groups: docker
-        append: yes
-      tags: add_docker_group
-      
+        append: true
+      tags:
+        - add_to_docker_group
+
     - name: Restart docker service
       ansible.builtin.systemd:
         state: restarted
-        enabled: yes
-        daemon_reload: yes
+        enabled: true
+        daemon_reload: true
         name: docker
 
     - name: Pull default docker image
@@ -116,16 +120,16 @@
       with_sequence: count={{ container_count }}
 
     - name: Getting all created containers
-      ansible.builtin.shell: docker ps -a
+      ansible.builtin.command: docker ps -a
       register: created_containers
 
     - name: Showing all created containers
       ansible.builtin.debug:
         msg: "{{ created_containers.stdout }}"
-      
+
     - name: Take a pause
-      ansible.builtin.shell: sleep 3
-    
+      ansible.builtin.command: sleep 3
+
     - name: Killing all created containers
       community.docker.docker_container:
         name: "{{ default_container_name }}{{ item }}"
@@ -134,6 +138,13 @@
         state: absent
       with_sequence: count={{ container_count }}
       tags:
-      - never
-      - destroy
+        - never
+        - destroy
+
+    - name: Reboot all machines with all defaults
+    # ansible.builtin.reboot module – Reboot a machine ->
+    # https://snip.ly/q74r1i
+      ansible.builtin.reboot:
+      tags:
+        - reboot_servers
 ...
