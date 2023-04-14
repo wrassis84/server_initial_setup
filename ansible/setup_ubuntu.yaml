@@ -26,6 +26,23 @@
         name: aptitude
         state: present
         update_cache: true
+      register: install_aptitude
+      # until: "'FAILED' in install_aptitude"
+      # # https://www.middlewareinventory.com/blog/ansible-retry-examples/
+      # retries: 5
+      # delay: 10
+
+    - name: Remove apt lock files
+    # Fix 'Couldn't get lock /var/lib/dpkg/lock'(Ubuntu)- https://snip.ly/j6oqr9
+    # Como corrigir os erros /var/lib/dpkg/lock ou o could not get lock
+    # /var/lib/dpkg/lock-frontend -> https://snip.ly/lfjor5
+      ansible.builtin.file:
+        path:
+          - /var/lib/dpkg/lock
+          - /var/lib/apt/lists/lock
+          - var/cache/apt/archives/lock
+        state: absent
+      when: '"FAILED" in install_aptitude'
 
     - name: Setup passwordless sudo
       ansible.builtin.lineinfile:
