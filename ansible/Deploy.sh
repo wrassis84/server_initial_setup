@@ -10,7 +10,7 @@
 #
 # Deploy.sh       : Executes Ansible Playbooks to Deploy Servers.
 # Requirements    : bash, ansible
-# Usage           : DataTex.sh [ list | add | remove ]
+# Usage           : ./Deploy.sh
 
 ######## TESTING ENVIRONMENT ###################################################
 
