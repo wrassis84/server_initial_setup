@@ -32,11 +32,11 @@ cd ../ && source .env && cd - > /dev/null
 echo "Configuring ssh hosts..."
 CleanSSH
 
-echo "Playing setup_ubuntu.yaml..."
-ansible-playbook setup_ubuntu.yaml -u sysadmin -b #> /dev/null
+echo "Playing setup_ubuntu.yml..."
+ansible-playbook setup_ubuntu.yml -u sysadmin -b #> /dev/null
 
-echo "Playing setup_docker.yaml"
-ansible-playbook setup_docker.yaml -u sysadmin -b #> /dev/null
+echo "Playing setup_docker.yml"
+ansible-playbook setup_docker.yml -u sysadmin -b #> /dev/null
 ######## MAIN CODE - END #######################################################
 # TODO:
 # Test if ansible is installed;
