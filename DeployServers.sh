@@ -26,8 +26,9 @@ CleanSSH () {
   done           
 }
 ######## MAIN CODE - START #####################################################
-echo "Configuring environment..."
-cd ../ && source .env && cd - > /dev/null
+echo "Configuring ansible environment..."
+cd $PWD/ansible
+source ansible.env > /dev/null
 
 echo "Configuring ssh hosts..."
 CleanSSH
@@ -37,6 +38,7 @@ ansible-playbook setup_ubuntu.yml -u sysadmin -b #> /dev/null
 
 echo "Playing setup_docker.yml"
 ansible-playbook setup_docker.yml -u sysadmin -b #> /dev/null
+cd ../
 ######## MAIN CODE - END #######################################################
 # TODO:
 # Test if ansible is installed;

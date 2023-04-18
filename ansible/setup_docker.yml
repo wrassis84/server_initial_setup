@@ -43,7 +43,7 @@
         state: absent
       when: '"FAILED" in install_aptitude'
 
-    - name: Install required system packages
+    - name: Install required system packages (git, curl, gnupg2, pip, ...)
       ansible.builtin.apt:
         pkg:
           - git
