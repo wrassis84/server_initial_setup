@@ -36,7 +36,7 @@ override.tf.json
 *.lock.hcl
 
 # Ignore environment variable file:
-*.env
+**/*.env
 
 # Ignore log files:
 *.log
