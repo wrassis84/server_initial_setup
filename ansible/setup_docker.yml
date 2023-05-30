@@ -1,7 +1,9 @@
 ---
 # At executing this playbook you can limit the hosts with "-l, --limit":
 # ansible-playbook playbook.yml -l server1 -u sysadmin
-- hosts: all
+- name: Setup Docker on servers
+
+  hosts: all
   become: true
   gather_facts: false
 
@@ -16,6 +18,7 @@
     - name: Get Ubuntu codename
       ansible.builtin.command: lsb_release -cs
       register: codename
+      changed_when: false
 
     - name: Print out the codename
       ansible.builtin.debug:
@@ -27,7 +30,7 @@
     - name: Install aptitude
       ansible.builtin.apt:
         name: aptitude
-        state: latest
+        state: present
         update_cache: true
       register: install_aptitude
 
@@ -57,7 +60,7 @@
           - python3-setuptools
           - lsb-release
           - lsb-core
-        state: latest
+        state: present
         update_cache: true
       tags:
         - install_pkgs
@@ -86,7 +89,7 @@
           - docker-ce
           - docker-ce-cli
           - containerd.io
-        state: latest
+        state: present
         update_cache: true
       tags:
         - install_docker
@@ -135,6 +138,7 @@
     - name: Getting all created containers
       ansible.builtin.command: docker ps -a
       register: created_containers
+      changed_when: false
 
     - name: Showing all created containers
       ansible.builtin.debug:
@@ -142,6 +146,7 @@
 
     - name: Take a pause
       ansible.builtin.command: sleep 3
+      changed_when: false
 
     - name: Killing all created containers
       community.docker.docker_container:
@@ -151,8 +156,8 @@
         state: absent
       with_sequence: count={{ container_count }}
       tags:
-        - never
-        - destroy
+        # - never #never run at least you use: ansible-playbook [...] --tags=never
+        - clean_containers
 
     - name: Reboot all machines with all defaults
     # ansible.builtin.reboot module – Reboot a machine ->

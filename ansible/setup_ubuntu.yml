@@ -1,26 +1,16 @@
 ---
 # For inspiration: How To Automate Initial Server Setup -> encr.pw/lcZmQ
 
-- hosts: all
+- name: Setup initial config on servers
+
+  hosts: all
   become: true
   vars:
     created_username: sysadmin
     root_user: root
 
   tasks:
-    # - name: Clean ssh hosts after deployed by Terraform # Don't work :(
-    #   ansible.builtin.known_hosts:
-    #     path: /home/william/.ssh/known_hosts
-    #     name: "{{ item }}"
-    #     state: absent
-    #   # loop: "{{ groups['all'] }}"
-    #   loop:
-    #     - 192.168.0.230
-    #     - 192.168.0.231
-    #     - 192.168.0.232
-    #   tags:
-    #     - clean_ssh_hosts
-
+  
     - name: Install aptitude
       ansible.builtin.apt:
         name: aptitude
