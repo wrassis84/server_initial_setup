@@ -77,8 +77,6 @@
       ansible.builtin.apt:
         name: "*"
         state: latest
-      tags:
-        - update_system
 
     - name: Make sure NTP service is running
       ansible.builtin.systemd:
